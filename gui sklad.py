@@ -19,6 +19,7 @@ class GUI:
         self.scrollbarY = ""
         self.screenWidth = mainWindow.winfo_screenwidth()
         self.my_font = font.Font(family="Monaco", size=10)
+        self.label_font = ("Times New Roman", 12, "bold")
         mainWindow.columnconfigure(0, weight=1)
         mainWindow.rowconfigure(0, weight=1)
         mainWindow.rowconfigure(1, weight=1)
@@ -90,10 +91,11 @@ class GUI:
                 messagebox.showerror("Error", zbozi.Ware_in_error)
             if zbozi.Positions_error:
                 messagebox.showerror("Error", zbozi.Positions_error)
+            return value
         except TclError:
-            messagebox.showerror("Error", "Wrong parameter entered (both article and amount must be dialed)\n"
-                                          "Article must be a string in format one letter followed by six numbers\n"
-                                          "Amount must be an positive integer")
+            messagebox.showerror("Error", "Wrong parameter entered (both article and amount must be entered)\n"
+                                          "Article must be a string in format one capital letter followed by six "
+                                          "numbers. Amount must be an positive integer")
 
     def call_ware_to(self):
         try:
@@ -109,9 +111,9 @@ class GUI:
             if zbozi.Ware_to_error:
                 messagebox.showerror("Error", zbozi.Ware_to_error)
         except TclError:
-            messagebox.showerror("Error",  "Wrong parameter entered (both article and amount must be dialed)\n"
-                                           "Article must be a string in format one letter followed by six numbers\n"
-                                           "Amount must be an positive integer\n"
+            messagebox.showerror("Error",  "Wrong parameter entered (article, amount and store unit must be entered)\n"
+                                           "Article must be a string in format one capital letter followed by six "
+                                           "numbers. Amount must be an positive integer\n"
                                            "Store unit must be a positive six character number, existing in database")
 
     def call_ware_out(self):
@@ -127,35 +129,25 @@ class GUI:
             if zbozi.Ware_out_error:
                 messagebox.showerror("Error", zbozi.Ware_out_error)
         except TclError:
-            messagebox.showerror("Error", "Wrong parameter entered (both article and amount must be dialed)\n"
-                                          "Article must be a string in format one letter followed by six numbers\n"
-                                          "Amount must be positive an integer")
+            messagebox.showerror("Error", "Wrong parameter entered (both article and amount must be entered)\n"
+                                          "Article must be a string in format one capital letter followed by six "
+                                          "numbers. Amount must be an positive integer")
 
     def call_search_article(self):
 
         try:
             self.value = ""
             ar = self.content.get()
-            am = self.content3.get()
-            if ar is not None and am is not "":
-                am = int(am)
-                value = zbozi.find_article(ar, am)
-                self.search_article_widgets()
-                if value:
-                    for item in value:
-                        self.result.insert(END, item)
-            else:
-                value = zbozi.find_article(ar)
-                self.search_article_widgets()
-                if value:
-                    for item in value:
-                        self.result.insert(END, item)
-                if zbozi.find_article_error:
-                    messagebox.showerror("Error", zbozi.find_article_error)
+            value = zbozi.find_article(ar)
+            self.search_article_widgets()
+            if value:
+                for item in value:
+                    self.result.insert(END, item)
+            if zbozi.find_article_error:
+                messagebox.showerror("Error", zbozi.find_article_error)
         except TclError:
-            messagebox.showerror("Error", "Wrong parameter entered (article must be dialed, amount field is optional)\n"
-                                          "Article must be a string in format one letter followed by six numbers\n"
-                                          "Amount must be positive an integer")
+            messagebox.showerror("Error", "Wrong parameter entered article must be entered"
+                                          "Article must be a string in format one letter followed by six numbers")
 
     def call_search_store_unit(self):
         try:
@@ -165,10 +157,10 @@ class GUI:
             if value:
                 for item in value:
                     self.result.insert(END, item)
-                if zbozi.find_store_unit_error:
-                    messagebox.showerror("Error", zbozi.find_store_unit_error)
+            if zbozi.find_store_unit_error:
+                messagebox.showerror("Error", zbozi.find_store_unit_error)
         except TclError:
-            messagebox.showerror("Error", "Wrong parameter entered (Store unit field must be dialed)\n"
+            messagebox.showerror("Error", "Wrong parameter entered (Store unit field must be entered)\n"
                                           "Store unit must be a positive six character number, existing in database")
 
     def call_search_position(self):
@@ -183,7 +175,7 @@ class GUI:
             if zbozi.find_position_error:
                 messagebox.showerror("Error", zbozi.find_position_error)
         except TclError:
-            messagebox.showerror("Error", "Wrong parameter entered (position field must be dialed)\n"
+            messagebox.showerror("Error", "Wrong parameter entered (position field must be entered)\n"
                                           "Position must be a string with length more than 4 characters but less than"
                                           "9 characters")
 
@@ -227,7 +219,7 @@ class GUI:
 
     @staticmethod
     def about():
-        messagebox.showinfo("info", "Created by Matyas Kadlec, 2018, version 1.1")
+        messagebox.showinfo("info", "Created by Matyas Kadlec, 2018, version 1.3")
 
     def remove_screen(self):
         self.ware_inFrame.grid_forget()
@@ -246,17 +238,20 @@ class GUI:
 
     def ware_in_widgets(self):
         self.remove_screen()
-        self.ware_inFrame.grid(row=0, column=0, sticky="w")
+        self.ware_inFrame.grid(row=0, column=0, sticky="w", columnspan=2)
+        ware_in_label = Label(self.ware_inFrame, text="WARE IN")
+        ware_in_label.configure(font=self.label_font)
+        ware_in_label.grid(row=0, column=0, padx=250, sticky="we", columnspan=2)
         article_label = Label(self.ware_inFrame, text="Article")
-        article_label.grid(row=0, column=0, sticky="w")
+        article_label.grid(row=1, column=0, sticky="w")
         entry_article = Entry(self.ware_inFrame, textvariable=self.content)
-        entry_article.grid(row=1, column=0, sticky="w")
+        entry_article.grid(row=2, column=0, sticky="w")
         entry_article.delete(0, END)
 
         amount_label = Label(self.ware_inFrame, text="Amount")
-        amount_label.grid(row=2, column=0, sticky="w")
+        amount_label.grid(row=3, column=0, sticky="w")
         entry_amount = Entry(self.ware_inFrame, textvariable=self.content2)
-        entry_amount.grid(row=3, column=0, sticky="w")
+        entry_amount.grid(row=4, column=0, sticky="w")
         entry_amount.delete(0, END)
 
         self.buttonFrame.grid(row=1, column=0, sticky="nsew")
@@ -268,22 +263,27 @@ class GUI:
         self.ware_toFrame.grid(row=0, column=0, sticky="w")
         self.ware_toFrame.columnconfigure(0, weight=1)
         self.ware_toFrame.rowconfigure(0, weight=1)
+
+        ware_to_label = Label(self.ware_toFrame, text="WARE TO")
+        ware_to_label.configure(font=self.label_font)
+        ware_to_label.grid(row=0, column=0, padx=250, sticky="we", columnspan=2)
+
         article_label = Label(self.ware_toFrame, text="Article")
-        article_label.grid(row=0, column=0, sticky="w")
+        article_label.grid(row=1, column=0, sticky="w")
         entry_article = Entry(self.ware_toFrame, textvariable=self.content)
-        entry_article.grid(row=1, column=0, sticky="w")
+        entry_article.grid(row=2, column=0, sticky="w")
         entry_article.delete(0, END)
 
         amount_label = Label(self.ware_toFrame, text="Amount")
-        amount_label.grid(row=2, column=0, sticky="w")
+        amount_label.grid(row=3, column=0, sticky="w")
         entry_amount = Entry(self.ware_toFrame, textvariable=self.content2)
-        entry_amount.grid(row=3, column=0, sticky="w")
+        entry_amount.grid(row=4, column=0, sticky="w")
         entry_amount.delete(0, END)
 
         store_unit_label = Label(self.ware_toFrame, text="Store unit")
-        store_unit_label.grid(row=4, column=0, sticky="w")
+        store_unit_label.grid(row=5, column=0, sticky="w")
         entry_store_unit = Entry(self.ware_toFrame, textvariable=self.content4)
-        entry_store_unit.grid(row=5, column=0, sticky="w")
+        entry_store_unit.grid(row=6, column=0, sticky="w")
         entry_store_unit.delete(0, END)
 
         self.buttonFrame.grid(row=1, column=0, sticky="w")
@@ -312,16 +312,21 @@ class GUI:
     def ware_out_widgets(self):
         self.remove_screen()
         self.ware_outFrame.grid(row=0, column=0, sticky="w")
+
+        ware_out_label = Label(self.ware_outFrame, text="WARE OUT")
+        ware_out_label.configure(font=self.label_font)
+        ware_out_label.grid(row=0, column=0, padx=250, sticky="we", columnspan=2)
+
         article_label = Label(self.ware_outFrame, text="Article")
-        article_label.grid(row=0, column=0, sticky="w")
+        article_label.grid(row=1, column=0, sticky="w")
         entry_article = Entry(self.ware_outFrame, textvariable=self.content)
-        entry_article.grid(row=1, column=0, sticky="w")
+        entry_article.grid(row=2, column=0, sticky="w")
         entry_article.delete(0, END)
 
         amount_label = Label(self.ware_outFrame, text="Amount")
-        amount_label.grid(row=2, column=0, sticky="w")
+        amount_label.grid(row=3, column=0, sticky="w")
         entry_amount = Entry(self.ware_outFrame, textvariable=self.content2)
-        entry_amount.grid(row=3, column=0, sticky="w")
+        entry_amount.grid(row=4, column=0, sticky="w")
         entry_amount.delete(0, END)
 
         self.buttonFrame.grid(row=1, column=0, sticky="w")
@@ -350,17 +355,16 @@ class GUI:
     def search_article_widgets(self):
         self.remove_screen()
         self.search_articleFrame.grid(row=0, column=0, sticky="w")
-        article_label = Label(self.search_articleFrame, text="Article")
-        article_label.grid(row=0, column=0, sticky="w")
-        entry_article = Entry(self.search_articleFrame, textvariable=self.content)
-        entry_article.grid(row=1, column=0, sticky="w")
-        entry_article.delete(0, END)
 
-        amount_label = Label(self.search_articleFrame, text="Amount")
-        amount_label.grid(row=2, column=0, sticky="w")
-        entry_amount = Entry(self.search_articleFrame, textvariable=self.content3)
-        entry_amount.grid(row=3, column=0, sticky="w")
-        entry_amount.delete(0, END)
+        search_article_label = Label(self.search_articleFrame, text="SEARCH ARTICLE")
+        search_article_label.configure(font=self.label_font)
+        search_article_label.grid(row=0, column=0, padx=250, sticky="we", columnspan=2)
+
+        article_label = Label(self.search_articleFrame, text="Article")
+        article_label.grid(row=1, column=0, sticky="w")
+        entry_article = Entry(self.search_articleFrame, textvariable=self.content)
+        entry_article.grid(row=2, column=0, sticky="w")
+        entry_article.delete(0, END)
 
         self.buttonFrame.grid(row=1, column=0, sticky="w")
         ok_button = Button(self.buttonFrame, text="OK", command=self.call_search_article)
@@ -390,10 +394,15 @@ class GUI:
         self.store_unitFrame.grid(row=0, column=0, sticky="nw")
         self.store_unitFrame.columnconfigure(0, weight=0)
         self.store_unitFrame.rowconfigure(0, weight=1)
+
+        search_store_unit_label = Label(self.store_unitFrame, text="SEARCH STORE UNIT")
+        search_store_unit_label.configure(font=self.label_font)
+        search_store_unit_label.grid(row=0, column=0, padx=250, sticky="we", columnspan=2)
+
         store_unit_label = Label(self.store_unitFrame, text="Store unit")
-        store_unit_label.grid(row=0, column=0, sticky="nw")
+        store_unit_label.grid(row=1, column=0, sticky="nw")
         entry_store_unit = Entry(self.store_unitFrame, textvariable=self.content2)
-        entry_store_unit.grid(row=1, column=0, sticky="nw")
+        entry_store_unit.grid(row=2, column=0, sticky="nw")
         entry_store_unit.delete(0, END)
 
         self.buttonFrame.grid(row=1, column=0, sticky="w")
@@ -424,10 +433,15 @@ class GUI:
         self.positionFrame.grid(row=0, column=0, sticky="nw")
         self.positionFrame.columnconfigure(0, weight=0)
         self.positionFrame.rowconfigure(0, weight=1)
+
+        search_position_label = Label(self.positionFrame, text="SEARCH POSITION")
+        search_position_label.configure(font=self.label_font)
+        search_position_label.grid(row=0, column=0, padx=250, sticky="we", columnspan=2)
+
         position_label = Label(self.positionFrame, text="Position")
-        position_label.grid(row=0, column=0, sticky="nw")
+        position_label.grid(row=1, column=0, sticky="nw")
         entry_position = Entry(self.positionFrame, textvariable=self.content)
-        entry_position.grid(row=1, column=0, sticky="nw")
+        entry_position.grid(row=2, column=0, sticky="nw")
         entry_position.delete(0, END)
 
         self.buttonFrame.grid(row=1, column=0, sticky="w")
@@ -455,6 +469,11 @@ class GUI:
 
     def view_table_widgets(self):
         self.remove_screen()
+
+        view_table_label = Label(self.radioFrame, text="DISPLAY ALL")
+        view_table_label.configure(font=self.label_font)
+        view_table_label.grid(row=0, column=0, padx=250, sticky="we", columnspan=2)
+
         self.resultFrame.grid(row=1, column=0, sticky="nsew")
         self.resultFrame.columnconfigure(0, weight=1)
         self.resultFrame.rowconfigure(0, weight=1)
@@ -475,37 +494,37 @@ class GUI:
         self.textFrame.rowconfigure(0, weight=1)
 
         self.radioFrame.grid(row=0, column=0, sticky="w")
-        self.radioFrame.columnconfigure(0, weight=1)
-        self.radioFrame.rowconfigure(0, weight=1)
+        # self.radioFrame.columnconfigure(0, weight=1)
+        # self.radioFrame.rowconfigure(0, weight=1)
         label = Label(self.radioFrame, text="Sort data by: ")
-        label.grid(row=0, column=0, sticky="w")
+        label.grid(row=1, column=0, sticky="w")
         label.columnconfigure(0, weight=1)
         label.rowconfigure(0, weight=1)
         r1 = Radiobutton(self.radioFrame, variable=self.content2, text="Article", value=1,
                          command=self.call_view_table)
 
-        r1.grid(row=1, column=0, sticky="w")
+        r1.grid(row=2, column=0, sticky="w")
         r1.columnconfigure(0, weight=1)
         r1.rowconfigure(0, weight=1)
         r2 = Radiobutton(self.radioFrame, variable=self.content2, text="Amount", value=2,
                          command=self.call_view_table)
-        r2.grid(row=2, column=0, sticky="w")
+        r2.grid(row=3, column=0, sticky="w")
 
         r3 = Radiobutton(self.radioFrame, variable=self.content2, text="Store unit", value=3,
                          command=self.call_view_table)
-        r3.grid(row=3, column=0, sticky="w")
+        r3.grid(row=4, column=0, sticky="w")
 
         r4 = Radiobutton(self.radioFrame, variable=self.content2, text="Position", value=4,
                          command=self.call_view_table)
-        r4.grid(row=4, column=0, sticky="w")
+        r4.grid(row=5, column=0, sticky="w")
 
         r5 = Radiobutton(self.radioFrame, variable=self.content2, text="Date", value=5,
                          command=self.call_view_table)
-        r5.grid(row=5, column=0, sticky="w")
+        r5.grid(row=6, column=0, sticky="w")
 
         header = Label(self.radioFrame, font=self.my_font, text="{:<8}{:>13}{:>13}{:>10}{:>15}".format
                                                                 ("Article", "Amount", "Store unit", "Position", "Date"))
-        header.grid(row=6, column=0, sticky="w")
+        header.grid(row=7, column=0, sticky="w")
 
     def help_me(self):
         self.remove_screen()
@@ -513,36 +532,40 @@ class GUI:
         self.radioFrameH.columnconfigure(0, weight=1)
         self.radioFrameH.rowconfigure(0, weight=1)
 
+        help_me_label = Label(self.radioFrameH, text="HELP")
+        help_me_label.configure(font=self.label_font)
+        help_me_label.grid(row=0, column=0, padx=250, sticky="we", columnspan=2)
+
         label = Label(self.radioFrameH, text="Documentation to function: ")
-        label.grid(row=0, column=0, sticky="w")
+        label.grid(row=1, column=0, sticky="w")
 
         r1 = Radiobutton(self.radioFrameH, variable=self.content5, text="Ware In", value=1,
                          command=self.call_help)
-        r1.grid(row=1, column=0, sticky="w")
+        r1.grid(row=2, column=0, sticky="w")
 
         r2 = Radiobutton(self.radioFrameH, variable=self.content5, text="Ware To", value=2,
                          command=self.call_help)
-        r2.grid(row=2, column=0, sticky="w")
+        r2.grid(row=3, column=0, sticky="w")
 
         r3 = Radiobutton(self.radioFrameH, variable=self.content5, text="Ware Out", value=3,
                          command=self.call_help)
-        r3.grid(row=3, column=0, sticky="w")
+        r3.grid(row=4, column=0, sticky="w")
 
         r4 = Radiobutton(self.radioFrameH, variable=self.content5, text="Search Article", value=4,
                          command=self.call_help)
-        r4.grid(row=4, column=0, sticky="w")
+        r4.grid(row=5, column=0, sticky="w")
 
         r5 = Radiobutton(self.radioFrameH, variable=self.content5, text="Search Store Unit", value=5,
                          command=self.call_help)
-        r5.grid(row=5, column=0, sticky="w")
+        r5.grid(row=6, column=0, sticky="w")
 
         r6 = Radiobutton(self.radioFrameH, variable=self.content5, text="Search Position", value=6,
                          command=self.call_help)
-        r6.grid(row=6, column=0, sticky="w")
+        r6.grid(row=7, column=0, sticky="w")
 
         r7 = Radiobutton(self.radioFrameH, variable=self.content5, text="Display All", value=7,
                          command=self.call_help)
-        r7.grid(row=7, column=0, sticky="w")
+        r7.grid(row=8, column=0, sticky="w")
 
         self.resultFrame.grid(row=1, column=0, sticky="nsew")
         self.resultFrame.columnconfigure(0, weight=1)
